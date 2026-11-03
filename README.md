@@ -1,3 +1,3 @@
 # My Checkout
 
-# My Checkout - yasmin
+# My Checkout - yas
