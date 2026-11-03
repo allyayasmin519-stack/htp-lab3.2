@@ -1,65 +1,40 @@
-
-# Workflow to demonstrate PR title command injection
+# workflow to show how to develop workflows in branches
 name: Develop in a branch
 
-on:
-  pull_request:
-  workflow_dispatch:
+on: [pull_request, workflow_dispatch]
 
 jobs:
   job1:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Lint Workflow Files
-        uses: raven-actions/actionlint@v2
+    #   - name: Lint Workflow Files
+        # uses: raven-actions/actionlint@v2
+        
+      - name: Install and Run Actionlint Natively
+        run: |
+          echo "=== Downloading Actionlint ==="
+            bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          
+          echo "=== Running Workflow Linting ==="
+          ./actionlint -color
+        shell: bash
 
       - name: Output Context Metadata
-        env:
-          BRANCH: ${{ github.ref }}
-          EVENT: ${{ github.event_name }}
-          ACTOR: ${{ github.actor }}
         run: |
-          echo "Workflow triggered in branch '${BRANCH}'."
-          echo "Workflow triggered by event '${EVENT}'."
-          echo "Workflow triggered by actor '${ACTOR}'."
+          echo "Workflow triggered in branch '${{ github.ref }}'."
+          echo "Workflow triggered by event '${{ github.event_name }}'."
+          echo "Workflow triggered by actor '${{ github.actor }}'."
 
-      # ==========================================
-      # DEMO 1: VULNERABLE IMPLEMENTATION
-      # ==========================================
-      - name: Print PR Title (Vulnerable)
+      - name: Print Pull Request Title
+        # run: echo "Demo PR title is '${{ github.event.pull_request.title }}'."
         if: github.event_name == 'pull_request'
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          echo "=== Vulnerable Implementation ==="
-          printf '%s\n' "$PR_TITLE"
-
-      # ==========================================
-      # DEMO 2: SAFE IMPLEMENTATION
-      # ==========================================
-      - name: Print PR Title (Safe)
-        if: github.event_name == 'pull_request'
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          echo "=== Safe Implementation ==="
-          printf '%s\n' "$PR_TITLE"
-
-      # ==========================================
-      # DEMO 3: Verify PR Title Handling
-      # ==========================================
-      - name: Check PR Title
-        if: github.event_name == 'pull_request'
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          echo "=== PR Title Verification ==="
-          echo "Title received successfully."
-          echo "Character count: ${#PR_TITLE}"
+        run: echo "Demo PR title is '$PR_TITLE'."
