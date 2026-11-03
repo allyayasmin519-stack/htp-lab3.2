@@ -1,27 +1,40 @@
-# workflow to show how to develop workflows in branches
+
+# Workflow to demonstrate developing workflows in branches
 name: Develop in a branch
-on: [pull_request, workflow_dispatch]
+
+on:
+  pull_request:
+  workflow_dispatch:
+
 jobs:
-    job1:
-        runs-on: ubuntu-latest
-        # Apply permissions globally to all jobs in this workflow
-        permissions:
-            contents: read
-            pull-requests: write
-        steps:
-          # Step 1: Fetch the repository files so actionlint can read them
-          - name: Check out repository code
-            uses: actions/checkout@v4.1.0
-          # Step 2: Scan your workflow files for syntax errors
-          - name: Run syntax linter
-            uses: devops-actions/actionlint@v0.1.2
-          # Step 3: Run your custom logging commands
-          - name: Log run metadata
-            run: | 
-             echo "::debug::This is a debug message."
-             echo "::notice::This is a notice message."
-             echo "::warning::This is a warning message."
-             echo "::error::This is an error message."
-             echo "Workflow  triggered in branch '${{ github.ref }}'."
-             echo "Workflow  triggered by event '${{ github.event_name }}'."
-             echo "Workflow  triggered by actor '${{ github.actor }}''."
+  job1:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Lint Workflow Files
+        uses: raven-actions/actionlint@v2
+
+      - name: Output Context Metadata
+        env:
+          GITHUB_REF: ${{ github.ref }}
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          echo "Workflow triggered in branch '${GITHUB_REF}'."
+          echo "Workflow triggered by event '${EVENT_NAME}'."
+          echo "Workflow triggered by actor '${ACTOR}'."
+
+      - name: Print Pull Request Title
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "Demo PR title is:"
+          printf '%s\n' "$PR_TITLE"
