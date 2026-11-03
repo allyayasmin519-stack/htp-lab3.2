@@ -1,5 +1,5 @@
 
-# Workflow to demonstrate developing workflows in branches
+# Workflow to demonstrate PR title command injection
 name: Develop in a branch
 
 on:
@@ -12,7 +12,6 @@ jobs:
 
     permissions:
       contents: read
-      pull-requests: write
 
     steps:
       - name: Checkout Source Code
@@ -23,18 +22,44 @@ jobs:
 
       - name: Output Context Metadata
         env:
-          GITHUB_REF: ${{ github.ref }}
-          EVENT_NAME: ${{ github.event_name }}
+          BRANCH: ${{ github.ref }}
+          EVENT: ${{ github.event_name }}
           ACTOR: ${{ github.actor }}
         run: |
-          echo "Workflow triggered in branch '${GITHUB_REF}'."
-          echo "Workflow triggered by event '${EVENT_NAME}'."
+          echo "Workflow triggered in branch '${BRANCH}'."
+          echo "Workflow triggered by event '${EVENT}'."
           echo "Workflow triggered by actor '${ACTOR}'."
 
-      - name: Print Pull Request Title
+      # ==========================================
+      # DEMO 1: VULNERABLE IMPLEMENTATION
+      # ==========================================
+      - name: Print PR Title (Vulnerable)
         if: github.event_name == 'pull_request'
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          echo "Demo PR title is:"
+          echo "=== Vulnerable Implementation ==="
           printf '%s\n' "$PR_TITLE"
+
+      # ==========================================
+      # DEMO 2: SAFE IMPLEMENTATION
+      # ==========================================
+      - name: Print PR Title (Safe)
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "=== Safe Implementation ==="
+          printf '%s\n' "$PR_TITLE"
+
+      # ==========================================
+      # DEMO 3: Verify PR Title Handling
+      # ==========================================
+      - name: Check PR Title
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "=== PR Title Verification ==="
+          echo "Title received successfully."
+          echo "Character count: ${#PR_TITLE}"
