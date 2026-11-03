@@ -4,7 +4,8 @@ on: [pull_request, workflow_dispatch]
 jobs:
  job1:
    runs-on: ubuntu-latest
-   steps:- run: |
+   steps:
+   - run: |
      echo "Workflow triggered in branch '${{ github.ref}}'."
-     Echo "Workflow triggered by event '${{ github.event_name }}'."
-     Echo "Workflow triggered by actor '${{ github.actor  }}''."
+     echo "Workflow triggered by event '${{ github.event_name }}'."
+     echo "Workflow triggered by actor '${{ github.actor  }}''."
