@@ -8,3 +8,4 @@ jobs:
      echo "Workflow triggered in branch '${{ github.ref}}'."
      Echo "Workflow triggered by event '${{ github.event_name }}'."
      Echo "Workflow triggered by actor '${{ github.actor  }}''."
+
